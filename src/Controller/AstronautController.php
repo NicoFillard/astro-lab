@@ -65,7 +65,7 @@ class AstronautController extends FOSRestController
         if (!$astronaut instanceof Astronaut) {
             return $this->json([
                 'success' => false,
-                'error' => 'Article not found'
+                'error' => 'Astronaut not found'
             ], Response::HTTP_NOT_FOUND);
         }
         $encoders = [new JsonEncoder()]; // If no need for XmlEncoder
@@ -78,31 +78,23 @@ class AstronautController extends FOSRestController
         ]);
         return new Response($jsonObject, 200, ['Content-Type' => 'application/json']);
     }
+
     /**
      * @FOSRest\Post("api/astronauts")
      *
-     * @ParamConverter("astronaut", converter="fos_rest.request_body")
-     *
      * @param ObjectManager $manager
-     * @param Astronaut $astronaut
-     * @param ValidatorInterface $validator
      *
+     * @param Request $request
      * @return Response
      */
-    public function postAstronautAction(ObjectManager $manager, Astronaut $astronaut, ValidatorInterface $validator)
+    public function postAstronautAction(ObjectManager $manager, Request $request)
     {
-        $errors = $validator->validate($astronaut);
-        if (!count($errors)) {
-            $astronaut->setName("New astronaut");
-            $manager->persist($astronaut);
-            $manager->flush();
-            return $this->json($astronaut, Response::HTTP_CREATED);
-        } else {
-            return $this->json([
-                'success' => false,
-                'error' => $errors[0]->getMessage().' ('.$errors->getPropertyPath().')'
-            ], Response::HTTP_BAD_REQUEST);
-        }
+        $astronaut = new Astronaut();
+        $astronaut->setName($request->get('name'));
+        $manager->persist($astronaut);
+        $manager->flush();
+
+        return $this->json($astronaut, Response::HTTP_CREATED);
     }
     /**
      * @FOSRest\Delete("api/astronaut/{id}")
@@ -125,7 +117,7 @@ class AstronautController extends FOSRestController
         } else {
             return $this->json([
                 'success' => false,
-                'error' => 'Article not found'
+                'error' => 'Astronaut not found'
             ], Response::HTTP_NOT_FOUND);
         }
     }
@@ -135,32 +127,23 @@ class AstronautController extends FOSRestController
      * @param Request $request
      * @param int $id
      * @param ObjectManager $manager
-     * @param ValidatorInterface $validator
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return Response
      */
-    public function updateArticleAction(Request $request, int $id, ObjectManager $manager, ValidatorInterface $validator)
+    public function updateArticleAction(Request $request, int $id, ObjectManager $manager)
     {
         $astronautRepository = $manager->getRepository(Astronaut::class);
         $existingAstronaut   = $astronautRepository->find($id);
         if (!$existingAstronaut instanceof Astronaut) {
             return $this->json([
                 'success' => false,
-                'error'   => 'Article not found'
+                'error'   => 'Astronaut not found'
             ], Response::HTTP_NOT_FOUND);
-        }
-        $form = $this->createForm(AstronautType::class, $existingAstronaut);
-        $form->submit($request->request->all());
-        $errors = $validator->validate($existingAstronaut);
-        if (!count($errors)) {
+        } else {
+            $existingAstronaut->setName($request->get('name'));
             $manager->persist($existingAstronaut);
             $manager->flush();
             return $this->json($existingAstronaut, Response::HTTP_CREATED);
-        } else {
-            return $this->json([
-                'success' => false,
-                'error'   => $errors[0]->getMessage() . ' (' . $errors[0]->getPropertyPath() . ')'
-            ], Response::HTTP_BAD_REQUEST);
         }
     }
 
