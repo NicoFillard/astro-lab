@@ -9,7 +9,8 @@
 .data/
 .idea/
 /logs
-postgres-data/
+postgres-data
+
 ###< symfony/framework-bundle ###
 
 ###> symfony/phpunit-bridge ###
