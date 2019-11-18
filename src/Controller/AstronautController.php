@@ -93,6 +93,7 @@ class AstronautController extends FOSRestController
 
         return $this->json($astronaut, Response::HTTP_CREATED);
     }
+
     /**
      * @FOSRest\Delete("api/astronaut/{id}")
      *
@@ -118,6 +119,7 @@ class AstronautController extends FOSRestController
             ], Response::HTTP_NOT_FOUND);
         }
     }
+
     /**
      * @FOSRest\Put("/api/astronaut/{id}")
      *
@@ -130,11 +132,11 @@ class AstronautController extends FOSRestController
     public function updateArticleAction(Request $request, int $id, ObjectManager $manager)
     {
         $astronautRepository = $manager->getRepository(Astronaut::class);
-        $existingAstronaut   = $astronautRepository->find($id);
+        $existingAstronaut = $astronautRepository->find($id);
         if (!$existingAstronaut instanceof Astronaut) {
             return $this->json([
                 'success' => false,
-                'error'   => 'Astronaut not found'
+                'error' => 'Astronaut not found'
             ], Response::HTTP_NOT_FOUND);
         } else {
             $existingAstronaut->setName($request->get('name'));
